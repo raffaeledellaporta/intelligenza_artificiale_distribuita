@@ -13,7 +13,7 @@ class ATMNode:
         self.host, self.port = NODES[node_id]
         self.successor = RING[node_id]
         self.token_manager = TokenManager(node_id)
-        self.transaction = ("withdraw", 200)
+        self.transaction = None
         self.logger = LoggerAdapter()
         self.terminated = False
 
@@ -27,7 +27,6 @@ class ATMNode:
         if msg.msg_type == "TOKEN":
             received_state = msg.data.get("NODE_STATE", {})
             NODE_STATE.update(received_state)
-            self.logger.info(f"[{self.node_id}] Stato aggiornato di NODE_STATE: {NODE_STATE}")
             self.token_manager.handle_token(self)
 
     def has_pending_transaction(self):
@@ -46,12 +45,9 @@ class ATMNode:
         self.logger.info(f"[{self.node_id}] Saldo aggiornato: {new_balance}")
         self.transaction = None
         self.terminated = True
-
         NODE_STATE[self.node_id] = True
-        self.logger.info(f"[{self.node_id}] Stato del nodo aggiornato {NODE_STATE}")
 
     def forward_token(self):
-        self.logger.info(f"[{self.node_id}] Stato corrente di NODE_STATE: {NODE_STATE}")
         if all(NODE_STATE[node] for node in NODE_STATE):
             self.logger.info(f"[{self.node_id}] Tutti i nodi hanno terminato. Arresto del sistema.")
             return

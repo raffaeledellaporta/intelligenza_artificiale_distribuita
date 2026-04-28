@@ -4,10 +4,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BALANCE_FILE = os.path.join(BASE_DIR, "data", "balance.txt")
 
 
-def init_balance(initial):
+def init_balance(initial, reset=False):
     os.makedirs(os.path.dirname(BALANCE_FILE), exist_ok=True)
 
-    if not os.path.exists(BALANCE_FILE) or os.path.getsize(BALANCE_FILE) == 0:
+    if reset or not os.path.exists(BALANCE_FILE) or os.path.getsize(BALANCE_FILE) == 0:
         with open(BALANCE_FILE, "w") as f:
             f.write(str(initial))
 

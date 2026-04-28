@@ -3,7 +3,7 @@ from distributed_bank_token_ring.node.atm_node import ATMNode
 from distributed_bank_token_ring.node.transaction_manager import init_balance
 
 if __name__ == "__main__":
-    init_balance(INITIAL_BALANCE)
+    init_balance(INITIAL_BALANCE, reset=True)
     NODE_STATE["ATM3"] = False
     node = ATMNode("ATM3")
     node.transaction = ("deposit", 100)
