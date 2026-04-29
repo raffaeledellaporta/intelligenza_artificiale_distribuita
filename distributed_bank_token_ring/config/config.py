@@ -13,10 +13,3 @@ RING = {
 }
 
 INITIAL_BALANCE = 1000
-
-NODE_STATE = {
-       "ATM1": False,
-       "ATM2": False,
-       "ATM3": False,
-       "ATM4": False,
-   }

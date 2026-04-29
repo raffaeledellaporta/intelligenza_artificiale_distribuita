@@ -6,10 +6,11 @@ class TokenManager:
         self.node_id = node_id
         self.logger = LoggerAdapter()
 
-    def handle_token(self, node):
+    def handle_token(self, node, token_data):
+        """Gestisce il Token."""
         self.logger.info(f"[{self.node_id}] Ricevuto TOKEN")
 
         if node.has_pending_transaction():
             node.execute_transaction()
 
-        node.forward_token()
+        node.forward_token(token_data)
