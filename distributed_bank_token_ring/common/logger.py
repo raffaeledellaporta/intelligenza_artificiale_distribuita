@@ -4,6 +4,10 @@ from distributed_bank_token_ring.common.logger_interface import LoggerInterface
 
 
 class LoggerAdapter(LoggerInterface):
+    """
+    Inizializza un logger che invia messaggi sulla console.
+    """
+
     def __init__(self) -> None:
         self._logger = logging.getLogger()
         if not self._logger.hasHandlers():  # Controlla se ci sono già degli handler

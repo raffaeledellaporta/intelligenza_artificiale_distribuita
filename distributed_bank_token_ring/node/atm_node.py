@@ -7,6 +7,11 @@ from distributed_bank_token_ring.network.server import Server
 
 class ATMNode:
     def __init__(self, node_id):
+        """
+        Inizializza un nodo ATM.
+        Args:
+            - node_id (str): ID univoco del nodo (es. "ATM1", "ATM2").
+        """
         self.node_id = node_id
         self.host, self.port = NODES[node_id]
         self.successor = RING[node_id]
@@ -14,15 +19,21 @@ class ATMNode:
         self.logger = LoggerAdapter()
         self.terminated = False
         self.last_token_id = None
-        self.processed_tokens = set()
 
     def start(self):
-        """Avvia il server per ascoltare i messaggi."""
+        """
+        Avvia il server che ascolta i messaggi in arrivo.
+        Il server gestisce la comunicazione con gli altri nodi dell'anello.
+        """
         server = Server(self.host, self.port, self.handle_message)
         server.start()
 
     def handle_message(self, data):
-        """Gestisce l'arrivo del TOKEN."""
+        """
+        Gestisce i messaggi ricevuti dal server, in particolare il token.
+        Args:
+            - data (str): Il messaggio ricevuto in formato JSON.
+        """
         msg = Message.from_json(data)
         if msg.msg_type == "TOKEN":
             token_data = msg.data.get("token_state", {})
@@ -35,16 +46,8 @@ class ATMNode:
             if token_id != self.last_token_id:
                 self.terminated = False
                 self.last_token_id = token_id
-            elif token_id in self.processed_tokens:
-                self.logger.info(f"[{self.node_id}] Token duplicato ignorato (id: {token_id}).")
-                return
-
-            # Registra il token come processato
-            self.processed_tokens.add(token_id)
 
             balance = token_data.get("balance", INITIAL_BALANCE)
-            for node in NODES.keys():
-                token_data.setdefault(node, False)
 
             # Aggiorna lo stato locale e controlla le operazioni
             self.logger.info(f"[{self.node_id}] Ricevuto TOKEN con stato: {token_data}")
@@ -63,12 +66,14 @@ class ATMNode:
             # Propaga il token al nodo successivo
             self.forward_token(token_data)
 
-    def has_pending_transaction(self):
-        """Verifica se ci sono transazioni in sospeso."""
-        return self.transaction is not None and not self.terminated
-
     def execute_transaction(self, balance):
-        """Esegue la transazione in coda."""
+        """
+        Esegue una transazione locale (deposito o prelievo).
+        Args:
+            - balance (int): Il saldo corrente.
+        Returns:
+            (int): Saldo aggiornato dopo la transazione.
+        """
         t_type, amount = self.transaction
         self.logger.info(f"[{self.node_id}] Inizio transazione: {t_type} {amount}")
 
@@ -86,10 +91,15 @@ class ATMNode:
         return balance
 
     def forward_token(self, token_state):
-        """Inoltra il token al successivo nodo nell'anello."""
+        """
+        Inoltra il token al successivo nodo nell'anello.
+        Args:
+            - token_state (dict): Stato del token da passare al successivo nodo.
+        """
         token_id = token_state.get("token_id")
+        origin_node = token_state.get("origin_node")
 
-        if all(token_state.get(node, False) for node in NODES.keys()):
+        if all(token_state.get(node, False) for node in NODES.keys()) and self.node_id == origin_node:
             self.logger.info(f"[{self.node_id}] Tutti i nodi hanno terminato. Arresto del sistema.")
             return
 

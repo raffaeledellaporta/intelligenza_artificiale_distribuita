@@ -14,6 +14,7 @@ if __name__ == "__main__":
         "ATM4": False,
         "balance": 1000,
         "token_id": token_id,
+        "origin_node": "ATM1"
     }
 
     send_message("localhost", 5001, Message("TOKEN", data={

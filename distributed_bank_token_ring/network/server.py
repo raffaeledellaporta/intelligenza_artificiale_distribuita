@@ -6,6 +6,13 @@ from distributed_bank_token_ring.common.logger import LoggerAdapter
 
 class Server:
     def __init__(self, host, port, handler):
+        """
+        Inizializza il server TCP.
+        Args:
+            - host (str): Indirizzo del server (es. "localhost").
+            - port (int): Porta su cui ascoltare i messaggi.
+            - handler (callable): Funzione chiamata per elaborare i messaggi ricevuti.
+        """
         self.host = host
         self.port = port
         self.handler = handler
@@ -14,6 +21,9 @@ class Server:
         self.logger = LoggerAdapter()
 
     def start(self):
+        """
+        Avvia il server e resta in ascolto per connessioni in entrata.
+        """
         self.server_socket.bind((self.host, self.port))
         self.server_socket.listen()
         self.logger.info(f"Server listening on {self.host}:{self.port}")
@@ -27,10 +37,18 @@ class Server:
             self.close()
 
     def handle_client(self, conn):
+        """
+        Gestisce un client connesso al server.
+        Args:
+            - conn (socket): La connessione con il client.
+        """
         data = conn.recv(1024).decode()
         if data:
             self.handler(data)
         conn.close()
 
     def close(self):
+        """
+        Chiude il socket del server.
+        """
         self.server_socket.close()
