@@ -77,17 +77,13 @@ python run/run_atm4.py
 
 ---
 
-## Step 2: Avviare il Token
+## Step 3: Inviare il Token Iniziale
 
-Aprire un **quinto terminale Python** ed eseguire:
-
-```python
-from distributed_bank_token_ring.network.client import send_message
-from distributed_bank_token_ring.common.message import Message
-
-send_message("localhost", 5001, Message("TOKEN").to_json())
+Aprire un quinto terminale ed eseguire lo script 
+```bash
+python run/start_token.py
 ```
-
+Questo comando invierà il token iniziale al nodo ATM1, consentendo l’inizio del ciclo token ring.
 Questo invia il token iniziale ad ATM1
 
 ---
